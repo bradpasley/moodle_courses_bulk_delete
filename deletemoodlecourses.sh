@@ -1,5 +1,12 @@
 #!/bin/bash
-
+#
+# by Brad Pasley (c) 2021
+#
+# This script automates the bulk resetting and deleting of Moodle courses. It depends on the following:
+# * moosh to be installed
+# * moodle directory - stored in the below variable. Please change to the correct path
+moodledirectory="/data/webs/au.edu.ac.moodle.he/moodle/"
+#
 #help screen
 displayHelp() 
 {
@@ -215,20 +222,12 @@ then
 fi
 
 #change to Moodle directory
-cd /data/webs/au.edu.ac.moodle.he/moodle/ 
+cd "$moodledirectory"
 
 #for each category provided as an argument, list, reset and delete each course
 for category in "$@"
 do
-   echo
-   echo "CategoryID $category"
-   echo
-   echo "CourseIDs:"
-   #list course ids, not on separate lines, but separated by commas, except the last one.
-   sudo -u www-data moosh course-list -i "category=$category" | tr '\n' ',' | sed '$s/,$/\n/'
-   echo
-   echo "Resetting these courses..."
-   
+      
    #$processlist = list of courseids to be processed
    if [[ "$multiprocess" == "true" ]]
    then
@@ -238,26 +237,35 @@ do
     processlist=$(sudo -u www-data moosh course-list -i "category=$category")
    fi
 
+   echo
+   echo "CategoryID $category"
+   echo
+   echo "CourseIDs:"
+   #list course ids, not on separate lines, but separated by commas, except the last one.
+   echo $processlist | sed '$s/,$/\n/'
+   echo
+   echo "Processing these courses..."
+
    if [[ "$resetonly" == "true" ]]
    then
     #debugging (just display what would be reset)
-    echo $processlist | xargs -n 1 echo "resetting"
+    #echo $processlist | xargs -n 1 echo "resetting"
     #reset each courseid supplied 
-    #echo $processlist | xargs -n 1 sudo -u www-data moosh course-reset 
+    echo $processlist | xargs -n 1 sudo -u www-data moosh course-reset 
    elif [[ "$deleteonly" == "true" ]]
    then
       #debugging (just display what would be deleted)
-      echo $processlist | xargs -n 1 echo "deleting"
+      #echo $processlist | xargs -n 1 echo "deleting"
       #delete each courseid supplied 
-      #echo $processlist | xargs -n 1 sudo -u www-data moosh course-delete 
+      echo $processlist | xargs -n 1 sudo -u www-data moosh course-delete 
    else #do both reset and delete
       #debugging (just display what would be reset)
-      echo $processlist | xargs -n 1 echo "resetting"
+      #echo $processlist | xargs -n 1 echo "resetting"
       #debugging (just display what would be deleted)
-      echo $processlist | xargs -n 1 echo "deleting"
+      #echo $processlist | xargs -n 1 echo "deleting"
       #reset each courseid supplied 
-      #echo $processlist | xargs -n 1 sudo -u www-data moosh course-reset 
-      #echo $processlist | xargs -n 1 sudo -u www-data moosh course-delete 
+      echo $processlist | xargs -n 1 sudo -u www-data moosh course-reset 
+      echo $processlist | xargs -n 1 sudo -u www-data moosh course-delete 
    fi  
    
    echo  
@@ -267,7 +275,5 @@ done
 echo
 echo "Bulk Moodle Course Deletion completed"
 echo
-echo "returning from Moodle directory to previous directory: "
-cd -
 
 
