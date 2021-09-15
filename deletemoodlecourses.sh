@@ -5,7 +5,7 @@
 # This script automates the bulk resetting and deleting of Moodle courses. It depends on the following:
 # * moosh to be installed
 # * moodle directory - stored in the below variable. Please change to the correct path
-moodledirectory="/data/webs/au.edu.ac.moodle.he/moodle/"
+moodledirectory="/data/webs/yourwebsitedomain/moodle/"
 #
 #help screen
 displayHelp() 
